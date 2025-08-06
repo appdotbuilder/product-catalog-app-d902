@@ -117,8 +117,13 @@ function App() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-green-900">
+        <div className="glass-panel p-8 animate-fade-in">
+          <div className="flex items-center space-x-4">
+            <div className="w-8 h-8 border-2 border-t-transparent border-green-400 rounded-full animate-spin"></div>
+            <span className="text-lg neon-text">Initializing System...</span>
+          </div>
+        </div>
       </div>
     );
   }

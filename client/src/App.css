@@ -1,131 +1,280 @@
+/* Neon Green Glass Theme Variables */
 :root {
-  --background: #fff;
-  --text: #000;
-  --text-secondary: #666;
-  --spinner-border: #000;
-  --spinner-border-top: transparent;
-  --dot-color: #000;
-  --grid-color: rgba(0,0,0,0.05);
-  --gradient-color: rgba(0,0,0,0.03);
+  /* Dark background for futuristic look */
+  --background: #0a0a0f;
+  --background-secondary: #111118;
+  --background-glass: rgba(0, 20, 0, 0.1);
+  --background-glass-hover: rgba(0, 30, 0, 0.15);
+  
+  /* Neon green palette */
+  --neon-green: #00ff88;
+  --neon-green-dim: #00cc6a;
+  --neon-green-bright: #39ffaa;
+  --neon-green-glow: rgba(0, 255, 136, 0.3);
+  --neon-green-glow-bright: rgba(0, 255, 136, 0.6);
+  
+  /* Text colors */
+  --text: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --text-muted: #606060;
+  --text-neon: var(--neon-green);
+  
+  /* Glass effects */
+  --glass-border: rgba(0, 255, 136, 0.2);
+  --glass-bg: rgba(0, 0, 0, 0.4);
+  --glass-bg-hover: rgba(0, 0, 0, 0.6);
+  
+  /* Shadows */
+  --shadow-neon: 0 0 20px var(--neon-green-glow);
+  --shadow-neon-bright: 0 0 30px var(--neon-green-glow-bright);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-glass-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
+  
+  /* Grid and patterns */
+  --grid-color: rgba(0, 255, 136, 0.05);
+  --gradient-color: rgba(0, 255, 136, 0.03);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-      --background: #000;
-      --text: #fff;
-      --text-secondary: #888;
-      --spinner-border: #fff;
-      --spinner-border-top: transparent;
-      --dot-color: #fff;
-      --grid-color: rgba(255,255,255,0.05);
-      --gradient-color: rgba(255,255,255,0.03);
-  }
-}
+/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: var(--background);
   color: var(--text);
-  padding: 20px;
-  line-height: 1.5;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-.container {
-  text-align: center;
-  max-width: 600px;
-}
-h1.title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  letter-spacing: -0.02em;
-}
-p.description {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
-}
-.spinner {
-  width: 40px;
-  height: 40px;
-  margin: 2rem auto;
+  line-height: 1.6;
+  overflow-x: hidden;
   position: relative;
 }
-.spinner::before {
+
+/* Animated background grid */
+body::before {
   content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border: 2px solid var(--spinner-border);
-  border-top-color: var(--spinner-border-top);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-.dots {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  margin-top: 2rem;
-}
-.dot {
-  width: 4px;
-  height: 4px;
-  background: var(--dot-color);
-  border-radius: 50%;
-  animation: fade 1.4s infinite ease-in-out;
-}
-.dot:nth-child(1) { animation-delay: -0.32s; }
-.dot:nth-child(2) { animation-delay: -0.16s; }
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes fade {
-  0%, 80%, 100% { opacity: 0; }
-  40% { opacity: 1; }
-}
-.grid {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-  background-image: 
-      linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-  background-size: 24px 24px;
-  transition: background-image 0.3s ease;
-}
-.gradient {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   z-index: -2;
-  background: radial-gradient(circle at center, var(--gradient-color) 0%, transparent 50%);
-  transition: background 0.3s ease;
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
 }
 
-.footer {
+/* Glowing gradient overlay */
+body::after {
+  content: '';
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 20% 20%, var(--neon-green-glow) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--neon-green-glow) 0%, transparent 50%);
+  animation: pulse 4s ease-in-out infinite alternate;
 }
 
-.footer-link {
-  color: var(--text);
-  text-decoration: none;
-  font-weight: bold;
+/* Glass panel base styles */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-glass);
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--neon-green-dim);
+  box-shadow: var(--shadow-glass-hover), var(--shadow-neon);
+  transform: translateY(-2px);
+}
+
+/* Neon text effects */
+.neon-text {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green-glow);
+}
+
+.neon-text-bright {
+  color: var(--neon-green-bright);
+  text-shadow: 0 0 15px var(--neon-green-glow-bright);
+}
+
+/* Glowing borders */
+.neon-border {
+  border: 1px solid var(--neon-green);
+  box-shadow: 
+    0 0 5px var(--neon-green-glow),
+    inset 0 0 5px var(--neon-green-glow);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon-green-dim);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-green);
+  box-shadow: 0 0 10px var(--neon-green-glow);
+}
+
+/* Animations */
+@keyframes gridMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px var(--neon-green-glow);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--neon-green-glow-bright);
+  }
+  100% {
+    box-shadow: 0 0 5px var(--neon-green-glow);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--background-glass) 25%,
+    var(--neon-green-glow) 50%,
+    var(--background-glass) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Responsive design helpers */
+.container-responsive {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .container-responsive {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding: 0 3rem;
+  }
+}
+
+/* Utility classes */
+.animate-slide-in {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeInScale 0.5s ease-out;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.cyber-border {
+  position: relative;
+}
+
+.cyber-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--neon-green), transparent, var(--neon-green));
+  border-radius: inherit;
+  z-index: -1;
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Focus states for accessibility */
+.focus-neon:focus {
+  outline: none;
+  box-shadow: 0 0 15px var(--neon-green-glow);
+  border-color: var(--neon-green);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --neon-green: #00ff00;
+    --text: #ffffff;
+    --glass-border: rgba(0, 255, 0, 0.8);
+  }
 }
