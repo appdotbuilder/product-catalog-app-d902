@@ -1,26 +1,30 @@
 
 import { type AdminLoginInput, type AdminAuthResponse } from '../schema';
+import { randomBytes } from 'crypto';
+
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'mysecurepass';
 
 export async function adminLogin(input: AdminLoginInput): Promise<AdminAuthResponse> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is authenticating admin users with hardcoded credentials.
-  // Username: "admin", Password: "mysecurepass"
-  // Should create a session token and store it in the database for session management.
-  // Returns success status, message, and session token if authentication succeeds.
-  
-  const ADMIN_USERNAME = 'admin';
-  const ADMIN_PASSWORD = 'mysecurepass';
-  
-  if (input.username === ADMIN_USERNAME && input.password === ADMIN_PASSWORD) {
+  try {
+    // Validate credentials
+    if (input.username !== ADMIN_USERNAME || input.password !== ADMIN_PASSWORD) {
+      return {
+        success: false,
+        message: 'Invalid credentials'
+      };
+    }
+
+    // Generate session token
+    const sessionToken = randomBytes(32).toString('hex');
+
     return {
       success: true,
       message: 'Login successful',
-      sessionToken: 'placeholder-session-token'
+      sessionToken
     };
+  } catch (error) {
+    console.error('Admin login failed:', error);
+    throw error;
   }
-  
-  return {
-    success: false,
-    message: 'Invalid credentials'
-  };
 }

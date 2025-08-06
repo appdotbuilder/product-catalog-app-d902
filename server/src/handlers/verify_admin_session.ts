@@ -1,10 +1,23 @@
 
+import { db } from '../db';
+import { sql } from 'drizzle-orm';
+
 export async function verifyAdminSession(sessionToken: string): Promise<{ isValid: boolean }> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is verifying if a session token is valid and not expired.
-  // This will be used to protect admin routes and verify authentication status.
-  // Should check the database for the session token and its expiration time.
-  return {
-    isValid: false // Placeholder - always returns false until implemented
-  };
+  try {
+    // Get current timestamp for expiration check
+    const now = new Date();
+    
+    // Query using raw SQL with the actual table name that should exist
+    const result = await db.execute(sql`
+      SELECT * FROM admin_sessions 
+      WHERE id = ${sessionToken} 
+      AND expires_at > ${now}
+    `);
+
+    // Check if session exists and is not expired
+    return { isValid: result.rows && result.rows.length > 0 };
+  } catch (error) {
+    console.error('Session verification failed:', error);
+    return { isValid: false };
+  }
 }

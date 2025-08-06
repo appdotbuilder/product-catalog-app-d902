@@ -1,28 +1,159 @@
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { HomePage } from './components/HomePage';
+import { AdminLogin } from './components/AdminLogin';
+import { AdminDashboard } from './components/AdminDashboard';
+import { trpc } from './utils/trpc';
 import './App.css';
 
+// Simple routing types
+type Route = 'home' | 'admin-login' | 'admin-dashboard';
+
+// Auth context for session management
+interface AuthContextType {
+  isAuthenticated: boolean;
+  sessionToken: string | null;
+  login: (token: string) => void;
+  logout: () => void;
+  checkAuth: () => Promise<boolean>;
+  navigate: (route: Route) => void;
+}
+
+export const AuthContext = React.createContext<AuthContextType>({} as AuthContextType);
+
+export type { Route, AuthContextType };
+
 function App() {
-  return (
-    <div>
-      <div className="gradient"></div>
-      <div className="grid"></div>
-      <div className="container">
-        <h1 className="title">Under Construction</h1>
-        <p className="description">
-          Your app is under construction. It's being built right now!
-        </p>
-        <div className="dots">
-          <div className="dot"></div>
-          <div className="dot"></div>
-          <div className="dot"></div>
-        </div>
-        <footer className="footer">
-          Built with ❤️ by{" "}
-          <a href="https://app.build" target="_blank" className="footer-link">
-            app.build
-          </a>
-        </footer>
+  const [currentRoute, setCurrentRoute] = useState<Route>('home');
+  const [sessionToken, setSessionToken] = useState<string | null>(
+    localStorage.getItem('adminSessionToken')
+  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  // Simple client-side routing
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/admin/login') {
+      setCurrentRoute('admin-login');
+    } else if (path === '/admin/dashboard') {
+      setCurrentRoute('admin-dashboard');
+    } else {
+      setCurrentRoute('home');
+    }
+  }, []);
+
+  const navigate = (route: Route) => {
+    setCurrentRoute(route);
+    // Update URL without page reload
+    const paths: Record<Route, string> = {
+      'home': '/',
+      'admin-login': '/admin/login',
+      'admin-dashboard': '/admin/dashboard'
+    };
+    window.history.pushState(null, '', paths[route]);
+  };
+
+  const checkAuth = useCallback(async (): Promise<boolean> => {
+    if (!sessionToken) {
+      setIsAuthenticated(false);
+      return false;
+    }
+
+    try {
+      const result = await trpc.admin.verifySession.query({ sessionToken });
+      const authenticated = result.isValid || false;
+      setIsAuthenticated(authenticated);
+      return authenticated;
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setIsAuthenticated(false);
+      localStorage.removeItem('adminSessionToken');
+      setSessionToken(null);
+      return false;
+    }
+  }, [sessionToken]);
+
+  useEffect(() => {
+    const verifyAuth = async () => {
+      setIsCheckingAuth(true);
+      await checkAuth();
+      setIsCheckingAuth(false);
+    };
+    
+    verifyAuth();
+  }, [checkAuth]);
+
+  const login = (token: string) => {
+    setSessionToken(token);
+    setIsAuthenticated(true);
+    localStorage.setItem('adminSessionToken', token);
+    navigate('admin-dashboard');
+  };
+
+  const logout = async () => {
+    if (sessionToken) {
+      try {
+        await trpc.admin.logout.mutate({ sessionToken });
+      } catch (error) {
+        console.error('Logout failed:', error);
+      }
+    }
+    
+    setSessionToken(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('adminSessionToken');
+    navigate('home');
+  };
+
+  const authValue: AuthContextType = {
+    isAuthenticated,
+    sessionToken,
+    login,
+    logout,
+    checkAuth,
+    navigate
+  };
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
       </div>
-    </div>
+    );
+  }
+
+  // Route protection and rendering
+  const renderCurrentRoute = () => {
+    switch (currentRoute) {
+      case 'home':
+        return <HomePage />;
+      
+      case 'admin-login':
+        if (isAuthenticated) {
+          // Redirect to dashboard if already authenticated
+          navigate('admin-dashboard');
+          return <AdminDashboard />;
+        }
+        return <AdminLogin />;
+      
+      case 'admin-dashboard':
+        if (!isAuthenticated) {
+          // Redirect to login if not authenticated
+          navigate('admin-login');
+          return <AdminLogin />;
+        }
+        return <AdminDashboard />;
+      
+      default:
+        return <HomePage />;
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={authValue}>
+      {renderCurrentRoute()}
+    </AuthContext.Provider>
   );
 }
 
